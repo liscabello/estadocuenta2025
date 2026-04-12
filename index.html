@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Estado de Cuenta Anual 2025 — Conjunto Los Girasoles</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#f7f6f2;--surface:#fff;--surface2:#f0efe9;
+  --text:#1a1a18;--text2:#6b6b65;--text3:#9e9d97;
+  --border:rgba(0,0,0,0.1);--border2:rgba(0,0,0,0.2);
+  --green:#2d7a3a;--green-bg:#e8f5eb;
+  --red:#c0392b;--red-bg:#fdf0ee;
+  --blue:#185fa5;--blue-bg:#e6f1fb;
+  --amber:#7a4a0a;--amber-bg:#faeeda;--amber-border:#854f0b;
+  --note:#854f0b;--note-bg:#fdf3e7;
+  --r:8px;--r-lg:14px;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#181816;--surface:#222220;--surface2:#2a2a28;
+    --text:#f0efe8;--text2:#9e9d97;--text3:#6b6b65;
+    --border:rgba(255,255,255,0.09);--border2:rgba(255,255,255,0.18);
+    --green-bg:#0f2e14;--red-bg:#2e100d;--blue-bg:#0c2a4a;
+    --amber-bg:#3a2005;--note-bg:#2e1c06;
+  }
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.6;}
+
+/* HERO */
+.hero{background:var(--surface);border-bottom:.5px solid var(--border);padding:2.5rem 1.5rem 2rem;}
+.hero-inner{max-width:1040px;margin:0 auto;}
+.hero-tag{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:.5rem;}
+.hero h1{font-size:26px;font-weight:500;margin-bottom:.4rem;}
+.hero-sub{font-size:14px;color:var(--text2);}
+.hero-note{font-size:13px;color:var(--text2);background:var(--amber-bg);border-left:3px solid var(--amber-border);padding:10px 14px;border-radius:0 var(--r) var(--r) 0;margin-top:1.25rem;max-width:740px;line-height:1.5;}
+
+/* LAYOUT */
+.wrap{max-width:1040px;margin:0 auto;padding:1.5rem 1.5rem 4rem;}
+
+/* KPI CARDS */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:1.5rem;}
+.kpi{background:var(--surface);border:.5px solid var(--border);border-radius:var(--r);padding:1rem 1.125rem;}
+.kpi-l{font-size:11px;color:var(--text3);margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em;}
+.kpi-v{font-size:21px;font-weight:500;}
+.kpi-s{font-size:11px;color:var(--text3);margin-top:2px;}
+.kpi.pos .kpi-v{color:var(--green);}
+.kpi.neg .kpi-v{color:var(--red);}
+.kpi.neu .kpi-v{color:var(--blue);}
+.kpi.warn .kpi-v{color:var(--amber-border);}
+
+/* SECTION CARDS */
+.sec-card{background:var(--surface);border:.5px solid var(--border);border-radius:var(--r-lg);margin-bottom:1rem;overflow:hidden;}
+.sec-head{padding:.75rem 1.125rem;border-bottom:.5px solid var(--border);display:flex;align-items:center;gap:10px;}
+.sec-head h2{font-size:12px;font-weight:500;color:var(--text);text-transform:uppercase;letter-spacing:.06em;}
+.pill{font-size:11px;padding:2px 9px;border-radius:99px;font-weight:500;}
+.pill-green{background:var(--green-bg);color:var(--green);}
+.pill-red{background:var(--red-bg);color:var(--red);}
+.pill-amber{background:var(--amber-bg);color:var(--amber-border);}
+.pill-blue{background:var(--blue-bg);color:var(--blue);}
+
+/* TABLE */
+.tw{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12.5px;}
+th{font-size:10px;font-weight:500;color:var(--text3);text-align:right;padding:7px 9px;border-bottom:.5px solid var(--border);white-space:nowrap;letter-spacing:.03em;text-transform:uppercase;}
+th:first-child{text-align:left;min-width:215px;}
+td{padding:7px 9px;border-bottom:.5px solid var(--border);text-align:right;white-space:nowrap;color:var(--text);}
+td:first-child{text-align:left;color:var(--text2);}
+tr:last-child td{border-bottom:none;}
+tr.total-row td{font-weight:500;color:var(--text);background:var(--surface2);}
+tr.total-row td:first-child{color:var(--text);}
+.dash{color:var(--text3);}
+.num-pos{color:var(--green);}
+.num-neg{color:var(--red);}
+.tot{font-weight:500;}
+
+/* NOTE CELL — note is on the VALUE cell, not the label */
+.has-note{
+  cursor:help;
+  position:relative;
+  background:var(--note-bg);
+  border-radius:4px;
+}
+.has-note::after{
+  content:'';
+  position:absolute;
+  top:3px;right:4px;
+  width:5px;height:5px;
+  border-radius:50%;
+  background:var(--note);
+  opacity:.85;
+}
+
+/* TOOLTIP */
+#tooltip{
+  position:fixed;z-index:9999;
+  background:var(--surface);
+  border:.5px solid var(--border2);
+  border-radius:var(--r);
+  padding:10px 14px;
+  font-size:12px;color:var(--text);
+  max-width:310px;white-space:pre-wrap;line-height:1.6;
+  pointer-events:none;display:none;
+  box-shadow:0 4px 20px rgba(0,0,0,.14);
+}
+#tt-label{
+  font-size:10px;font-weight:500;text-transform:uppercase;
+  letter-spacing:.05em;color:var(--text3);
+  margin-bottom:6px;padding-bottom:5px;
+  border-bottom:.5px solid var(--border);
+}
+
+/* BAR CHART */
+.chart-area{padding:1.25rem 1.125rem .75rem;}
+.chart-title{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px;}
+.barchart{display:flex;align-items:flex-end;gap:5px;height:110px;padding-bottom:22px;position:relative;}
+.barchart::after{content:'';position:absolute;bottom:22px;left:0;right:0;height:.5px;background:var(--border2);}
+.bcol{flex:1;display:flex;flex-direction:column;align-items:center;}
+.bbar{width:100%;border-radius:3px 3px 0 0;}
+.bbar.pos{background:#2d7a3a;}
+.bbar.neg{background:#c0392b;}
+.bbar:hover{opacity:.75;cursor:default;}
+.bval{font-size:9px;white-space:nowrap;margin:2px 0;}
+.blabel{font-size:10px;color:var(--text3);margin-top:5px;}
+
+/* PENDING */
+.pending-box{margin:1.125rem;padding:14px 16px;background:var(--amber-bg);border-radius:var(--r);border-left:3px solid var(--amber-border);}
+.pending-box .pt{font-size:11px;font-weight:500;color:var(--amber-border);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;}
+.pending-box .pd{font-size:13px;color:var(--text);}
+.pending-box .pv{font-size:20px;font-weight:500;color:var(--amber-border);margin-top:4px;}
+
+/* LEGEND */
+.note-legend{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);background:var(--surface);border:.5px solid var(--border);border-radius:var(--r-lg);padding:.875rem 1.125rem;margin-top:1rem;}
+.note-swatch{width:12px;height:12px;border-radius:3px;background:var(--note-bg);border:.5px solid var(--note);flex-shrink:0;position:relative;}
+.note-swatch::after{content:'';position:absolute;top:1px;right:2px;width:4px;height:4px;border-radius:50%;background:var(--note);}
+
+footer{text-align:center;font-size:12px;color:var(--text3);padding:2rem 1rem;border-top:.5px solid var(--border);}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">Conjunto Residencial Los Girasoles</div>
+    <h1>Estado de Cuenta Anual 2025</h1>
+    <div class="hero-sub">Enero – Diciembre 2025</div>
+    <div class="hero-note">El comité actual tuvo acceso al portal bancario desde agosto 2025. Los meses previos (enero–julio) se presentan del estado de cuenta bancario.</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- KPIs -->
+  <div class="kpis">
+    <div class="kpi pos">
+      <div class="kpi-l">Total ingresos</div>
+      <div class="kpi-v">$58,796</div>
+      <div class="kpi-s">enero – diciembre</div>
+    </div>
+    <div class="kpi neg">
+      <div class="kpi-l">Total egresos</div>
+      <div class="kpi-v">$58,013</div>
+      <div class="kpi-s">pagos realizados</div>
+    </div>
+    <div class="kpi neu">
+      <div class="kpi-l">Saldo final dic.</div>
+      <div class="kpi-v">$1,881</div>
+      <div class="kpi-s">cierre diciembre 2025</div>
+    </div>
+    <div class="kpi pos">
+      <div class="kpi-l">Alícuotas cobradas</div>
+      <div class="kpi-v">$55,312</div>
+      <div class="kpi-s">ingresos recurrentes</div>
+    </div>
+    <div class="kpi warn">
+      <div class="kpi-l">Pago pendiente</div>
+      <div class="kpi-v">$2,485</div>
+      <div class="kpi-s">portones 1, 2 y 3</div>
+    </div>
+  </div>
+
+  <!-- INGRESOS -->
+  <div class="sec-card">
+    <div class="sec-head">
+      <h2>Ingresos</h2>
+      <span class="pill pill-green">Créditos bancarios</span>
+    </div>
+    <div class="tw">
+      <table>
+        <thead>
+          <tr>
+            <th>Concepto</th>
+            <th>Ene</th><th>Feb</th><th>Mar</th><th>Abr</th><th>May</th><th>Jun</th>
+            <th>Jul</th><th>Ago</th><th>Sep</th><th>Oct</th><th>Nov</th><th>Dic</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Alícuotas</td>
+            <td>4,488</td><td>4,324</td><td>4,898</td><td>4,494</td><td>4,031</td><td>5,133</td>
+            <td>3,730</td><td>4,115</td><td>4,129</td><td>5,910</td><td>4,825</td><td>5,235</td>
+            <td class="tot">55,312</td>
+          </tr>
+          <tr>
+            <td>Ingresos Comida Criolla</td>
+            <td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td>
+            <td>1,321</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td>
+            <td class="tot">1,321</td>
+          </tr>
+          <tr>
+            <!-- H16: nota en valor Jul → 167.50 -->
+            <td>Donación Comida Criolla</td>
+            <td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td>
+            <td class="has-note" data-label="Donación Comida Criolla — Julio" data-note="$25 fueron en efectivo. No reflejados en banco.">167.50</td>
+            <td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td>
+            <td class="tot">167.50</td>
+          </tr>
+          <tr>
+            <td>Rifas</td>
+            <td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td>
+            <td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td>1,995</td>
+            <td class="tot">1,995</td>
+          </tr>
+          <tr class="total-row">
+            <td>Total ingresos</td>
+            <td>4,488</td><td>4,324</td><td>4,898</td><td>4,494</td><td>4,031</td><td>5,133</td>
+            <td>5,218.50</td><td>4,115</td><td>4,129</td><td>5,910</td><td>4,825</td><td>7,230</td>
+            <td>58,795.50</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- EGRESOS -->
+  <div class="sec-card">
+    <div class="sec-head">
+      <h2>Egresos</h2>
+      <span class="pill pill-red">Pagos realizados</span>
+    </div>
+    <div class="tw">
+      <table>
+        <thead>
+          <tr>
+            <th>Concepto</th>
+            <th>Ene</th><th>Feb</th><th>Mar</th><th>Abr</th><th>May</th><th>Jun</th>
+            <th>Jul</th><th>Ago</th><th>Sep</th><th>Oct</th><th>Nov</th><th>Dic</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Egresos Bancarios (Ene–Jul)</td>
+            <td>4,349.01</td><td>4,174.83</td><td>4,374.27</td><td>5,926.49</td><td>4,183.76</td><td>3,143.10</td>
+            <td>4,146.14</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td>
+            <td class="tot">30,297.60</td>
+          </tr>
+          <tr>
+            <td>Nómina / Porterías</td>
+            <td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td>
+            <td class="dash">—</td><td>2,138.68</td><td>2,260.07</td><td>3,295.75</td><td>1,050</td><td>4,686.16</td>
+            <td class="tot">13,430.66</td>
+          </tr>
+          <tr>
+            <!-- I23=Ago nota "Reemplazo en portería" | J23=Sep nota "Pago agosto" | K23=Oct nota "Pago sep y oct" | M23=Dic nota "Pago nov y dic" -->
+            <td>Seguridad (Segurtrust)</td>
+            <td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td>
+            <td class="dash">—</td>
+            <td class="has-note" data-label="Seguridad — Agosto" data-note="Reemplazo en portería">345</td>
+            <td class="has-note" data-label="Seguridad — Septiembre" data-note="Pago agosto">1,441.02</td>
+            <td class="has-note" data-label="Seguridad — Octubre" data-note="Pago septiembre y octubre">2,882.04</td>
+            <td class="dash">—</td>
+            <td class="has-note" data-label="Seguridad — Diciembre" data-note="Pago noviembre y diciembre">2,882.04</td>
+            <td class="tot">7,550.10</td>
+          </tr>
+          <tr>
+            <td>IESS</td>
+            <td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td>
+            <td class="dash">—</td><td>373.90</td><td>364.22</td><td>373.90</td><td>373.90</td><td>373.90</td>
+            <td class="tot">1,859.82</td>
+          </tr>
+          <tr>
+            <td>Telefonía Celular</td>
+            <td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td>
+            <td class="dash">—</td><td>25.66</td><td>25.66</td><td>25.66</td><td>25.66</td><td>25.66</td>
+            <td class="tot">128.30</td>
+          </tr>
+          <tr>
+            <!-- L26=Nov nota "Servicios administrativos septiembre y octubre" -->
+            <td>Servicios Administrativos</td>
+            <td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td>
+            <td class="dash">—</td><td>57.50</td><td>57.50</td><td class="dash">—</td>
+            <td class="has-note" data-label="Servicios Administrativos — Noviembre" data-note="Servicios administrativos septiembre y octubre">115</td>
+            <td>57.50</td>
+            <td class="tot">287.50</td>
+          </tr>
+          <tr>
+            <td>Servicios Contables</td>
+            <td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td>
+            <td class="dash">—</td><td>35.94</td><td>35.94</td><td>35.94</td><td>35.94</td><td>35.94</td>
+            <td class="tot">179.70</td>
+          </tr>
+          <tr>
+            <td>Reemplazo Portería</td>
+            <td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td>
+            <td class="dash">—</td><td>340</td><td>110</td><td>55</td><td>30</td><td>115</td>
+            <td class="tot">650</td>
+          </tr>
+          <tr>
+            <td>Limpieza y Mantenimiento</td>
+            <td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td>
+            <td class="dash">—</td><td>240</td><td>330</td><td>395</td><td>60</td><td>321</td>
+            <td class="tot">1,346</td>
+          </tr>
+          <tr>
+            <td>Revisión / Reparación Cerco Eléctrico</td>
+            <td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td>
+            <td class="dash">—</td><td>85</td><td class="dash">—</td><td>40</td><td class="dash">—</td><td>230</td>
+            <td class="tot">355</td>
+          </tr>
+          <tr>
+            <!-- I31=Ago nota "$25 saldados en efectivo" -->
+            <td>Reembolsos Comida Criolla</td>
+            <td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td>
+            <td class="dash">—</td>
+            <td class="has-note" data-label="Reembolsos Comida Criolla — Agosto" data-note="$25 saldados en efectivo">378.26</td>
+            <td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td>
+            <td class="tot">378.26</td>
+          </tr>
+          <tr>
+            <!-- I32=Ago nota larga | J32=Sep nota plan facturación | L32=Nov nota rifas | M32=Dic nota diciembre -->
+            <td>Otros / Reembolsos</td>
+            <td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td>
+            <td class="dash">—</td>
+            <td class="has-note" data-label="Otros / Reembolsos — Agosto"
+                data-note="$29,25 - Almuerzos para personal que taló árboles del parque
+$6,70 - Insumos de cafetería para portería
+$12,78 - Lona M2 y argollas para convocatoria
+$70,00 - Reparación cerco eléctrico, anticipo 70%
+$9,20 - Insumos de limpieza para portería
+$30,00 - Reparación cerco eléctrico, saldo 30%
+$38,99 - Firma electrónica dos años
+$20,00 - Limpieza del canal por trabajadores
+$7,75 - Dispensador de agua Consuplast Deluxe
+$37,50 - Mano de obra, candado y copias de llaves
+$10,17 - 2 cintas M y 2 brochas
+$50,51 - Organizador 36 llaves, llavero y letrero baño
+$20,00 - Devolución pago en exceso alícuota Sr. Velastegui">342.85</td>
+            <td class="has-note" data-label="Otros / Reembolsos — Septiembre"
+                data-note="Plan facturación electrónica 1.200 documentos anual">124.34</td>
+            <td>400</td>
+            <td class="has-note" data-label="Otros / Reembolsos — Noviembre"
+                data-note="$31,00 - Trámite municipio
+$160,00 - 1.000 rifas impreso full color perforado tamaño 13×6 y 4 lonas impreso full color">191</td>
+            <td class="has-note" data-label="Otros / Reembolsos — Diciembre"
+                data-note="$150,00 - Anticipo trámite de elementos de seguridad
+$40,36 - Compras navideñas del comité
+$10,00 - Envío en carro papeles trámite portones al municipio
+$40,00 - Armada árbol navideño
+$14,50 - 29 pelotas personajes surtidos
+$35,00 - Combo 50 sorpresas Confiteca, combo 36 sorpresas">289.86</td>
+            <td class="tot">1,348.05</td>
+          </tr>
+          <tr>
+            <td>Comisiones Bancarias + IVA</td>
+            <td>13.87</td><td>15.05</td><td>17.25</td><td>18.61</td><td>12.68</td><td>12.68</td>
+            <td>32.29</td><td>16.18</td><td>13.42</td><td>17.61</td><td>9.53</td><td>22.83</td>
+            <td class="tot">202</td>
+          </tr>
+          <tr class="total-row">
+            <td>Total egresos</td>
+            <td>4,362.88</td><td>4,189.88</td><td>4,391.52</td><td>5,945.10</td><td>4,196.44</td><td>3,155.78</td>
+            <td>4,178.43</td><td>4,378.97</td><td>4,762.17</td><td>7,520.90</td><td>1,891.03</td><td>9,039.89</td>
+            <td>58,012.99</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- BALANCE -->
+  <div class="sec-card">
+    <div class="sec-head">
+      <h2>Balance</h2>
+      <span class="pill pill-blue">Resultado y saldo acumulado</span>
+    </div>
+    <div class="chart-area">
+      <div class="chart-title">Resultado neto mensual ($)</div>
+      <div class="barchart" id="barchart"></div>
+    </div>
+    <div class="tw">
+      <table>
+        <thead>
+          <tr>
+            <th>Concepto</th>
+            <th>Ene</th><th>Feb</th><th>Mar</th><th>Abr</th><th>May</th><th>Jun</th>
+            <th>Jul</th><th>Ago</th><th>Sep</th><th>Oct</th><th>Nov</th><th>Dic</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Resultado neto del mes</td>
+            <td class="num-pos">+125.12</td><td class="num-pos">+134.12</td><td class="num-pos">+506.48</td>
+            <td class="num-neg">−1,451.10</td><td class="num-neg">−165.44</td><td class="num-pos">+1,977.22</td>
+            <td class="num-pos">+1,040.07</td><td class="num-neg">−263.97</td><td class="num-neg">−633.17</td>
+            <td class="num-neg">−1,610.90</td><td class="num-pos">+2,933.97</td><td class="num-neg">−1,809.89</td>
+          </tr>
+          <tr>
+            <td>Saldo mes anterior</td>
+            <td>1,098.36</td><td>1,223.48</td><td>1,357.60</td><td>1,864.08</td><td>412.98</td><td>247.54</td>
+            <td>2,224.76</td><td>3,264.83</td><td>3,000.86</td><td>2,367.69</td><td>756.79</td><td>3,690.76</td>
+          </tr>
+          <tr class="total-row">
+            <!-- H41=Jul nota "$3239,83 valor en banco + $25 efectivo" -->
+            <td>Saldo fin de mes</td>
+            <td>1,223.48</td><td>1,357.60</td><td>1,864.08</td><td>412.98</td><td>247.54</td><td>2,224.76</td>
+            <td class="has-note" data-label="Saldo fin de mes — Julio" data-note="$3,239.83 valor en banco&#10;$25.00 efectivo">3,264.83</td>
+            <td>3,000.86</td><td>2,367.69</td><td>756.79</td><td>3,690.76</td><td>1,880.87</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PAGOS PENDIENTES -->
+  <div class="sec-card">
+    <div class="sec-head">
+      <h2>Pagos Pendientes</h2>
+      <span class="pill pill-amber">No incluidos en egresos</span>
+    </div>
+    <div class="pending-box">
+      <div class="pt">Materiales por Reparación Portones 1, 2 y 3</div>
+      <div class="pd">Valor correspondiente a materiales pendientes de pago, no registrados como egreso en el estado de cuenta 2025.</div>
+      <div class="pv">$2,485.39</div>
+    </div>
+  </div>
+
+  <!-- LEYENDA -->
+  <div class="note-legend">
+    <div class="note-swatch"></div>
+    <span>Las celdas con fondo claro y punto naranja tienen notas de detalle — pasa el cursor sobre ellas para ver la información adicional.</span>
+  </div>
+
+</div>
+
+<footer>Conjunto Residencial Los Girasoles &nbsp;·&nbsp; Estado de Cuenta Anual 2025</footer>
+
+<div id="tooltip">
+  <div id="tt-label"></div>
+  <div id="tt-body"></div>
+</div>
+
+<script>
+const tt=document.getElementById('tooltip');
+const ttL=document.getElementById('tt-label');
+const ttB=document.getElementById('tt-body');
+
+document.querySelectorAll('.has-note').forEach(el=>{
+  el.addEventListener('mouseenter',function(e){
+    ttL.textContent=this.dataset.label||'Nota';
+    ttB.textContent=this.dataset.note||'';
+    tt.style.display='block';
+    move(e);
+  });
+  el.addEventListener('mousemove',move);
+  el.addEventListener('mouseleave',()=>tt.style.display='none');
+});
+
+function move(e){
+  const pad=14,tw=tt.offsetWidth,th=tt.offsetHeight;
+  let x=e.clientX+pad, y=e.clientY-pad;
+  if(x+tw>window.innerWidth-8) x=e.clientX-tw-pad;
+  if(y+th>window.innerHeight-8) y=window.innerHeight-th-8;
+  if(y<8) y=8;
+  tt.style.left=x+'px'; tt.style.top=y+'px';
+}
+
+/* bar chart */
+const netos=[125.12,134.12,506.48,-1451.1,-165.44,1977.22,1040.07,-263.97,-633.17,-1610.9,2933.97,-1809.89];
+const meses=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const maxAbs=Math.max(...netos.map(v=>Math.abs(v)));
+const H=88;
+const chart=document.getElementById('barchart');
+
+netos.forEach((v,i)=>{
+  const col=document.createElement('div');
+  col.className='bcol';
+  const h=Math.max(3,Math.round(Math.abs(v)/maxAbs*H));
+  const bar=document.createElement('div');
+  bar.className='bbar '+(v>=0?'pos':'neg');
+  bar.style.height=h+'px';
+  bar.title=(v>=0?'+':'')+v.toLocaleString('es-EC',{minimumFractionDigits:2});
+
+  const vEl=document.createElement('div');
+  vEl.className='bval';
+  vEl.textContent=(v>=0?'+':'')+Math.round(Math.abs(v));
+  vEl.style.color=v>=0?'#2d7a3a':'#c0392b';
+
+  const lEl=document.createElement('div');
+  lEl.className='blabel';
+  lEl.textContent=meses[i];
+
+  if(v>=0){col.appendChild(vEl);col.appendChild(bar);}
+  else{col.appendChild(bar);col.appendChild(vEl);}
+  col.appendChild(lEl);
+  chart.appendChild(col);
+});
+</script>
+</body>
+</html>
